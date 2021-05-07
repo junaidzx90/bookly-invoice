@@ -114,7 +114,7 @@ function bookly_invoice_run(){
             <h1>Menu page</h1>
             <?php
             global $wpdb;
-            $bookly_cappointments = $wpdb->get_results("SELECT bca.*,bp.*,bc.*,bp.created_at AS payment_date FROM {$wpdb->prefix}bookly_customer_appointments bca, {$wpdb->prefix}bookly_payments bp, {$wpdb->prefix}bookly_customers bc WHERE bca.customer_id = bc.id AND bca.payment_id = bp.id");
+            $bookly_cappointments = $wpdb->get_results("SELECT bca.*,bp.*,bc.*,bp.created_at AS payment_date, bp.details AS payment_details FROM {$wpdb->prefix}bookly_customer_appointments bca, {$wpdb->prefix}bookly_payments bp, {$wpdb->prefix}bookly_customers bc WHERE bca.customer_id = bc.id AND bca.payment_id = bp.id");
 
             // object(stdClass)#831 (54) {
             //     ["id"]=>
@@ -173,21 +173,25 @@ function bookly_invoice_run(){
             //     string(0) ""
             //   }
 
+            // payment id
+            $payment_ids = [];
+            // All payment details
+            $payment_details = [];
+
             if(!empty($bookly_cappointments)){
                 foreach($bookly_cappointments as $customerinfo){
                     // customer_id
                     // payment_id
-                    // $customerinfo
-                    $payment_details = json_decode($customerinfo->details, true);
-                    foreach($payment_details as $details){
-                        // echo '<pre>';
-                        echo $details;
-                    }
-                    
+                    $payment_ids[] = $customerinfo->id;
+                    // echo '<pre>';
+                    // var_dump();
+                    // $payment_details
+                    $payment_infos = json_decode($customerinfos->payment_details, true);
+                    $payment_details[] = $payment_info['items'][0];
                 }
             }
             // echo '<pre>';
-            // var_dump($bookly_cappointments);
+            // var_dump($payment_details);
             
         }
     }
