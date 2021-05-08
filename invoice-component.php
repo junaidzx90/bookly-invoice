@@ -12,107 +12,71 @@
     </select>
 </div>
 
-<?php
-$customer_id = 95;
-$user_appointments = $wpdb->get_results("SELECT * FROM {$wpdb->prefix}bookly_customer_appointments WHERE customer_id = $customer_id");
-
-
-
-?>
 <div class="payments">
-  <table>
-      <thead>
-        <tr>
-          <th class="serial">Serial</th>
-          <th class="date">Date</th>
-          <th class="employee">Employee</th>
-          <th class="status">Status</th>
-          <th class="view">View</th>
-        </tr>
-      </thead>
-      <tbody id="payments_found">
-        <!--  -->
-      </tbody>
-  </table>
+  
 </div>
 <link rel="stylesheet" href="https://printjs-4de6.kxcdn.com/print.min.css">
-<div id="wrapper">
-    <div class="clearfix" id="header_section">
-      <h1>INVOICE 3-2-1</h1>
 
-      <div id="company" class="clearfix">
-        <div>Company Name</div>
-        <div>455 Foggy Heights,<br /> AZ 85004, US</div>
-        <div>(602) 519-0450</div>
-        <div><a href="mailto:company@example.com">company@example.com</a></div>
-      </div>
+<!-- <div class="popup">
+  <div class="poupcontents">
+    <div id="wrapper">
+        <div class="clearfix" id="header_section">
+          <h1>INVOICE 3-2-1</h1>
 
-      <div id="informations">
-        <div><span>PROJECT</span> Website development</div>
-        <div><span>CLIENT</span> John Doe</div>
-        <div><span>ADDRESS</span> 796 Silver Harbour, TX 79273, US</div>
-        <div><span>EMAIL</span> <a href="mailto:john@example.com">john@example.com</a></div>
-        <div><span>DATE</span> August 17, 2015</div>
-        <div><span>DUE DATE</span> September 17, 2015</div>
-      </div>
+          <div id="company" class="clearfix">
+            <div>Company Name</div>
+            <div>455 Foggy Heights,<br /> AZ 85004, US</div>
+            <div>(602) 519-0450</div>
+            <div><a href="mailto:company@example.com">company@example.com</a></div>
+          </div>
 
+          <div id="informations">
+            <div><span>PROJECT</span> Website development</div>
+            <div><span>CLIENT</span> John Doe</div>
+            <div><span>ADDRESS</span> 796 Silver Harbour, TX 79273, US</div>
+            <div><span>EMAIL</span> <a href="mailto:john@example.com">john@example.com</a></div>
+            <div><span>DATE</span> August 17, 2015</div>
+            <div><span>DUE DATE</span> September 17, 2015</div>
+          </div>
+
+        </div>
+        <main>
+          <table>
+            <thead>
+              <tr>
+                <th class="service">SERVICE</th>
+                <th class="desc">DESCRIPTION</th>
+                <th>PRICE</th>
+                <th>QTY</th>
+                <th>TOTAL</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="service">Design</td>
+                <td class="desc">Creating a recognizable design solution based on the company's existing visual identity</td>
+                <td class="unit">$40.00</td>
+                <td class="qty">26</td>
+                <td class="total">$1,040.00</td>
+              </tr>
+              <tr>
+                <td colspan="4">SUBTOTAL</td>
+                <td class="total">$5,200.00</td>
+              </tr>
+              <tr>
+                <td colspan="4">TAX 25%</td>
+                <td class="total">$1,300.00</td>
+              </tr>
+              <tr>
+                <td colspan="4" class="grand total">GRAND TOTAL</td>
+                <td class="grand total">$6,500.00</td>
+              </tr>
+            </tbody>
+          </table>
+        </main>
     </div>
-    <main>
-      <table>
-        <thead>
-          <tr>
-            <th class="service">SERVICE</th>
-            <th class="desc">DESCRIPTION</th>
-            <th>PRICE</th>
-            <th>QTY</th>
-            <th>TOTAL</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td class="service">Design</td>
-            <td class="desc">Creating a recognizable design solution based on the company's existing visual identity</td>
-            <td class="unit">$40.00</td>
-            <td class="qty">26</td>
-            <td class="total">$1,040.00</td>
-          </tr>
-          <tr>
-            <td class="service">Development</td>
-            <td class="desc">Developing a Content Management System-based Website</td>
-            <td class="unit">$40.00</td>
-            <td class="qty">80</td>
-            <td class="total">$3,200.00</td>
-          </tr>
-          <tr>
-            <td class="service">SEO</td>
-            <td class="desc">Optimize the site for search engines (SEO)</td>
-            <td class="unit">$40.00</td>
-            <td class="qty">20</td>
-            <td class="total">$800.00</td>
-          </tr>
-          <tr>
-            <td class="service">Training</td>
-            <td class="desc">Initial training sessions for staff responsible for uploading web content</td>
-            <td class="unit">$40.00</td>
-            <td class="qty">4</td>
-            <td class="total">$160.00</td>
-          </tr>
-          <tr>
-            <td colspan="4">SUBTOTAL</td>
-            <td class="total">$5,200.00</td>
-          </tr>
-          <tr>
-            <td colspan="4">TAX 25%</td>
-            <td class="total">$1,300.00</td>
-          </tr>
-          <tr>
-            <td colspan="4" class="grand total">GRAND TOTAL</td>
-            <td class="grand total">$6,500.00</td>
-          </tr>
-        </tbody>
-      </table>
-    </main>
-</div>
+  </div>
+</div> -->
 <button type="button" onclick="printJS('wrapper', 'html')">
     Print Form
  </button>

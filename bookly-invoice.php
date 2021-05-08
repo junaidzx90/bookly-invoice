@@ -102,6 +102,107 @@ function bookly_invoice_run(){
         
     // }
 
+    // Get payments information
+    add_action("wp_ajax_get_invoice_data", "get_invoice_data");
+    add_action("wp_ajax_nopriv_get_invoice_data", "get_invoice_data");
+    function get_invoice_data(){
+        if(isset($_GET['user_id'])){
+            global $wpdb;
+            $user_id = $_GET['user_id'];
+            $user_id = intval($user_id);
+
+            // How many appoints
+            $payments = $wpdb->get_results("SELECT bca.*,bp.*,bc.* FROM {$wpdb->prefix}bookly_customer_appointments bca, {$wpdb->prefix}bookly_payments bp, {$wpdb->prefix}bookly_customers bc WHERE bca.customer_id = $user_id AND bca.customer_id = bc.id AND bca.payment_id = bp.id");
+            
+            
+            //type,status,total,paid,full_name,phone,country,postcode,state,email,city,street,payment_date
+            //     ["details"]=>
+            //     string(392) "{"items":[{"ca_id":98,"appointment_date":"2021-04-05 10:00:00","service_name":"Rijles 1 uur","service_price":"50","service_tax":0,"wait_listed":false,"number_of_persons":1,"units":1,"duration":"3600","staff_name":"Abdullah Cakmak","extras":[]}],"coupon":null,"subtotal":{"price":"50","deposit":0},"customer":"Samed S\u00f6kmen","tax_in_price":"excluded","tax_paid":"0.00","from_backend":true}"
+            if(!empty($payments) && !is_wp_error( $wpdb )){
+                
+                $payment_details = json_decode($payments[0]->details,true);
+                
+                //$payment_details['items'][0];
+                
+                // adjustments
+                
+                $output = '';
+                $output .= '<div id="wrapper">';
+                $output .= '<div class="clearfix" id="header_section">';
+                $output .= '<h1>'.__(get_bloginfo('name'), BKLY_NAME).'- INVOICE</h1>';
+
+                $output .= '<div id="customer_info" class="clearfix">';
+                $output .= '<div>Company Name</div>';
+                $output .= '<div>CEO</div>';
+                $output .= '<div>Phone</div>';
+                $output .= '<div><a href="mailto:email@gmail.com">email@gmail.com</a></div>';
+                $output .= '</div>';
+
+                $output .= '<div id="informations">';
+                $output .= '<div><span>CUSTOMER</span> '.__($payments[0]->full_name, BKLY_NAME).'</div>';
+                $output .= '<div><span>ADDRESS</span> '.__($payments[0]->state.', '.$payments[0]->city.', '.$payments[0]->street.', '.$payments[0]->postcode.', '.$payments[0]->country, BKLY_NAME).'</div>';
+                $output .= '<div><span>EMAIL</span> <a href="mailto:'.__($payments[0]->email, BKLY_NAME).'">'.__($payments[0]->email, BKLY_NAME).'</a></div>';
+                // $output .= '<div><span>DATE</span> '.__(date('Y/m/d', strtotime($payments[0]->created_at)), BKLY_NAME).'</div>';
+                $output .= '<div><span>TYPE</span> '.__($payments[0]->type, BKLY_NAME).'</div>';
+                $output .= '</div>';
+
+                $output .= '</div>';
+                $output .= '<main>';
+                $output .= '<table>';
+                $output .= '<thead>';
+                $output .= '<tr>';
+                $output .= '<th class="service">Maintenance</th>';
+                $output .= '<th class="desc">Date</th>';
+                $output .= '<th>Hour</th>';
+                $output .= '<th>Service Price</th>';
+                $output .= '<th class="desc">Adjustments</th>';
+                $output .= '<th class="amount">Adjust-Amount</th>';
+                $output .= '<th class="paid">Paid</th>';
+                $output .= '<th>Cost</th>';
+                $output .= '</tr>';
+                $output .= '</thead>';
+                $output .= '<tbody>';
+
+                foreach($payments as $pay){
+                    $_details = json_decode($pay->details,true);
+                    // var_dump($_details['subtotal']['price']);die;
+
+                    $output .= '<tr>';
+                    $output .= '<td class="service">'.__($_details['items'][0]['service_name'], BKLY_NAME).'</td>';$output .= '<td class="date">'.__(date('Y/m/d', strtotime($pay->created_at)), BKLY_NAME).'</td>';
+                    $output .= '<td class="hour">'.floor($_details['items'][0]['duration'] / (60 * 60)).' Hour </td>';
+                    $output .= '<td class="price">'.__($_details['items'][0]['service_price'], BKLY_NAME).'</td>';
+                    $output .= '<td class="desc">';
+                    if($_details['adjustments'][0]['reason'] !== "null"){
+                        $output .= __($_details['adjustments'][0]['reason'], BKLY_NAME);
+                    }
+                    $output .= '</td>';
+                    $output .= '<td class="amount">'.__($_details['adjustments'][0]['amount'], BKLY_NAME).'</td>';
+                    $output .= '<td class="paid">'.__($pay->paid, BKLY_NAME).'</td>';
+                    $output .= '<td class="cost">'.__($pay->total, BKLY_NAME).'</td>';
+                    $output .= '</tr>';
+                }
+                $output .= '<tr>';
+                $output .= '<td colspan="7">SUBTOTAL</td>';
+                $output .= '<td class="total">'.__($_details['subtotal']['price'], BKLY_NAME).'</td>';
+                $output .= '</tr>';
+                $output .= '<tr>';
+                $output .= '<td class="total">$1,300.00</td>';
+                $output .= '</tr>';
+                
+                $output .= '</tbody>';
+                $output .= '</table>';
+                $output .= '</main>';
+                $output .= '</div>';
+
+                echo json_encode($output);
+                die;
+            }
+
+            die;
+        }
+        die;
+    }
+
     // bookly_invoice_reset
     add_action("wp_ajax_get_user_appoint_information", "get_user_appoint_information");
     add_action("wp_ajax_nopriv_get_user_appoint_information", "get_user_appoint_information");
@@ -179,8 +280,9 @@ function bookly_invoice_run(){
             //     string(5) "50.00"
             //     ["paid_type"]=>
             //     string(7) "in_full"
-            //     ["details"]=>
-            //     string(392) "{"items":[{"ca_id":98,"appointment_date":"2021-04-05 10:00:00","service_name":"Rijles 1 uur","service_price":"50","service_tax":0,"wait_listed":false,"number_of_persons":1,"units":1,"duration":"3600","staff_name":"Abdullah Cakmak","extras":[]}],"coupon":null,"subtotal":{"price":"50","deposit":0},"customer":"Samed S\u00f6kmen","tax_in_price":"excluded","tax_paid":"0.00","from_backend":true}"
+            // type,status,total,paid,full_name,phone,country,postcode,state,email,city,street,payment_date
+            // //     ["details"]=>
+            // //     string(392) "{"items":[{"ca_id":98,"appointment_date":"2021-04-05 10:00:00","service_name":"Rijles 1 uur","service_price":"50","service_tax":0,"wait_listed":false,"number_of_persons":1,"units":1,"duration":"3600","staff_name":"Abdullah Cakmak","extras":[]}],"coupon":null,"subtotal":{"price":"50","deposit":0},"customer":"Samed S\u00f6kmen","tax_in_price":"excluded","tax_paid":"0.00","from_backend":true}"
             //     ["wp_user_id"]=>
             //     string(2) "77"
             //     ["full_name"]=>

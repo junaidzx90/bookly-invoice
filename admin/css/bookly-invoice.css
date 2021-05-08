@@ -11,7 +11,6 @@
   
 #wrapper {
     position: relative;
-    width: 70%;
     color: #001028;
     background: #FFFFFF;
     font-family: Arial, sans-serif;
@@ -29,9 +28,9 @@ th.view,td.viewbtns{
 td.viewbtns button{
     cursor: pointer;
 }
+
 .payments {
     width: 70%;
-    padding: 10px;
     border: 1px solid #ddd;
     margin: 50px 0px;
     background: #fff;
@@ -42,6 +41,7 @@ td.completed{
 #header_section {
     padding: 10px 0;
     margin-bottom: 30px;
+    overflow: hidden;
 }
 
 h1 {
@@ -69,13 +69,13 @@ h1 {
     font-size: 0.8em;
 }
   
-#company {
+#customer_info {
     float: right;
     text-align: right;
 }
   
 #informations div,
-#company div {
+#customer_info div {
     white-space: nowrap;        
 }
   
