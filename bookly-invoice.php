@@ -20,6 +20,7 @@
 
 define( 'BKLY_NAME', 'bookly-invoice' );
 define( 'BKLY_PATH', plugin_dir_path( __FILE__ ) );
+define( 'BKLY_URL', plugin_dir_url( __FILE__ ) );
 
 if ( ! defined( 'WPINC' ) && ! defined('BKLY_NAME') && ! defined('BKLY_PATH')) {
 	die;
@@ -75,8 +76,8 @@ function bookly_invoice_run(){
 
     // Admin Enqueue Scripts
     add_action('admin_enqueue_scripts',function(){
-        wp_register_style( BKLY_NAME, BKLY_PATH.'admin/css/bookly-invoice.css', array(), microtime(), 'all' );
-        wp_register_script( BKLY_NAME, BKLY_PATH.'admin/js/bookly_invoice-admin.js', array(), 
+        wp_register_style( BKLY_NAME, BKLY_URL.'admin/css/bookly-invoice.css', array(), microtime(), 'all' );
+        wp_register_script( BKLY_NAME, BKLY_URL.'admin/js/bookly-invoice.js', array(), 
         microtime(), true );
         wp_localize_script( BKLY_NAME, 'admin_ajax_action', array(
             'ajaxurl' => admin_url( 'admin-ajax.php' )
@@ -102,8 +103,46 @@ function bookly_invoice_run(){
     // }
 
     // bookly_invoice_reset
-    // add_action("wp_ajax_bookly_invoice_reset_colors", "bookly_invoice_reset_colors");
-    // add_action("wp_ajax_nopriv_bookly_invoice_reset_colors", "bookly_invoice_reset_colors");
+    add_action("wp_ajax_get_user_appoint_information", "get_user_appoint_information");
+    add_action("wp_ajax_nopriv_get_user_appoint_information", "get_user_appoint_information");
+    function get_user_appoint_information(){
+        if(isset($_POST['user_id'])){
+            global $wpdb;
+            $customer_id = $_POST['user_id'];
+            $customer_id = intval($customer_id);
+
+            // How many appoints
+            $user_appointments = $wpdb->get_results("SELECT bca.payment_id AS payment_id,bp.status AS status, bp.details AS payment_details FROM {$wpdb->prefix}bookly_customer_appointments bca, {$wpdb->prefix}bookly_payments bp WHERE bca.customer_id = $customer_id AND bp.id = payment_id");
+            
+            if(!empty($user_appointments) && !is_wp_error( $wpdb )){
+                $output = '';
+                $i = 1;
+                foreach($user_appointments as $payments){
+                    $payment_details = json_decode($payments->payment_details,true);
+                    
+                    $employee = $payment_details['items'][0]['staff_name'];
+                    $date = $payment_details['items'][0]['appointment_date'];
+
+                    $output .= '<tr>';
+                    $output .= '<td>'.$i.'</td>';
+                    $output .= '<td class="date">'.$date.'</td>';
+                    $output .= '<td class="employee">'.__($employee,'bookly-invoice').'</td>';
+                    $output .= '<td class="status '.$payments->status.'">'.__($payments->status,'bookly-invoice').'</td>';
+                    $output .= '<td class="viewbtns"><button payment_id="'.intval($payments->payment_id).'" customer_id="'.intval($customer_id).'" id="view_invoice">VIEW</button></td>';
+                    $output .= '</tr>';
+                    $i++;
+
+                }
+                echo json_encode($output);
+                die;
+            }
+            die;
+        }
+        die;
+    }
+
+    // How many appoints
+    // $user_appointments = $wpdb->get_results("SELECT bca.payment_id AS payment_id,bp.total AS total,bp.status AS status, bp.paid AS paid,bp.created_at AS payment_date, bp.details AS payment_details FROM {$wpdb->prefix}bookly_customer_appointments bca, {$wpdb->prefix}bookly_payments bp WHERE bca.customer_id = $customer_id AND bp.id = payment_id");
 
     // Menu callback funnction
     function bookly_invoice_menupage_display(){
@@ -111,10 +150,9 @@ function bookly_invoice_run(){
             wp_enqueue_style(BKLY_NAME);
             wp_enqueue_script(BKLY_NAME);
             ?>
-            <h1>Menu page</h1>
             <?php
             global $wpdb;
-            $bookly_cappointments = $wpdb->get_results("SELECT bca.*,bp.*,bc.*,bp.created_at AS payment_date, bp.details AS payment_details FROM {$wpdb->prefix}bookly_customer_appointments bca, {$wpdb->prefix}bookly_payments bp, {$wpdb->prefix}bookly_customers bc WHERE bca.customer_id = bc.id AND bca.payment_id = bp.id");
+            $bookly_cappointments = $wpdb->get_results("SELECT bca.*,bp.*,bc.id AS ID,bc.* FROM {$wpdb->prefix}bookly_customer_appointments bca, {$wpdb->prefix}bookly_payments bp, {$wpdb->prefix}bookly_customers bc WHERE bca.customer_id = bc.id AND bca.payment_id = bp.id GROUP BY bc.full_name");
 
             // object(stdClass)#831 (54) {
             //     ["id"]=>
@@ -173,25 +211,29 @@ function bookly_invoice_run(){
             //     string(0) ""
             //   }
 
-            // payment id
+            // customer ids
+            $customer_ids = [];
+            // payment ids
             $payment_ids = [];
             // All payment details
             $payment_details = [];
 
             if(!empty($bookly_cappointments)){
                 foreach($bookly_cappointments as $customerinfo){
-                    // customer_id
-                    // payment_id
-                    $payment_ids[] = $customerinfo->id;
-                    // echo '<pre>';
-                    // var_dump();
-                    // $payment_details
-                    $payment_infos = json_decode($customerinfos->payment_details, true);
-                    $payment_details[] = $payment_info['items'][0];
+                    // // customer_id
+                    // $customer_ids[] = $customerinfo->customer_id;
+                    // // payment_id
+                    // $payment_ids[] = $customerinfo->payment_id;
+                    // // $payment_details
+                    // $payment_infos = json_decode($customerinfos->payment_details, true);
+                    // $payment_details[] = $payment_info['items'][0];
+
+                    require_once 'invoice-component.php';
                 }
             }
+
             // echo '<pre>';
-            // var_dump($payment_details);
+            // var_dump($customer_ids);
             
         }
     }
