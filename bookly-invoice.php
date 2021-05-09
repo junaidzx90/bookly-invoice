@@ -37,20 +37,19 @@ function bookly_invoice_init() {
     add_action('init', 'bookly_invoice_run');
 }
 
+function bookly_invoice_admin_noticess(){
+    $message = sprintf(
+        /* translators: 1: Plugin Name 2: Elementor */
+        print_r( '%1$s requires <a href="https://wordpress.org/plugins/bookly-responsive-appointment-booking-tool/"> %2$s </a> to be installed and activated.', 'bookly_invoice' ),
+        '<strong>' . esc_html__( 'Bookly Invoice', 'bookly_invoice' ) . '</strong>',
+        '<strong>' . esc_html__( 'Bookly', 'bookly_invoice' ) . '</strong>'
+    );
+
+    printf( '<div class="notice notice-warning is-dismissible"><p>%1$s</p></div>', $message );
+}
+
 // Main Function iitialize
 function bookly_invoice_run(){
-
-    function bookly_invoice_admin_noticess(){
-        $message = sprintf(
-            /* translators: 1: Plugin Name 2: Elementor */
-            print_r( '%1$s requires <a href="https://wordpress.org/plugins/bookly-responsive-appointment-booking-tool/"> %2$s </a> to be installed and activated.', 'bookly_invoice' ),
-            '<strong>' . esc_html__( 'Bookly Invoice', 'bookly_invoice' ) . '</strong>',
-            '<strong>' . esc_html__( 'Bookly', 'bookly_invoice' ) . '</strong>'
-        );
-
-        printf( '<div class="notice notice-warning is-dismissible"><p>%1$s</p></div>', $message );
-    }
-
     register_activation_hook( __FILE__, 'activate_bookly_invoice_cplgn' );
     register_deactivation_hook( __FILE__, 'deactivate_bookly_invoice_cplgn' );
 
