@@ -56,17 +56,7 @@ function bookly_invoice_run(){
 
     // Activision function
     function activate_bookly_invoice_cplgn(){
-        // global $wpdb;
-        // require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
-
-        // $bookly_invoice_v1 = "CREATE TABLE IF NOT EXISTS `{$wpdb->prefix}bookly_invoice__v1` (
-        //     `ID` INT NOT NULL AUTO_INCREMENT,
-        //     `user_id` INT NOT NULL,
-        //     `username` VARCHAR(255) NOT NULL,
-        //     `account1` INT NOT NULL,
-        //     `account2` INT NOT NULL,
-        //     PRIMARY KEY (`ID`)) ENGINE = InnoDB";
-        //     dbDelta($bookly_invoice_v1);
+        // 
     }
 
     // Dectivision function
@@ -87,20 +77,7 @@ function bookly_invoice_run(){
     // Register Menu
     add_action('admin_menu', function(){
         add_menu_page( 'bookly_invoice', 'bookly_invoice', 'manage_options', 'bookly_invoice', 'bookly_invoice_menupage_display', 'dashicons-admin-network', 45 );
-    
-        // // For colors
-        // add_settings_section( 'bookly_invoice_colors_section', 'Activation Colors', '', 'bookly_invoice_colors' );
-    
-        // //Activate Button
-        // add_settings_field( 'bookly_invoice_activate_button', 'Activate Button', 'bookly_invoice_activate_button_func', 'bookly_invoice_colors', 'bookly_invoice_colors_section');
-        // register_setting( 'bookly_invoice_colors_section', 'bookly_invoice_activate_button');
-        
     });
-
-    // activate Button colors
-    // function bookly_invoice_activate_button_func(){
-        
-    // }
 
     // Get payments information
     add_action("wp_ajax_get_invoice_data", "get_invoice_data");
@@ -115,24 +92,15 @@ function bookly_invoice_run(){
             $payments = $wpdb->get_results("SELECT bca.*,bp.*,bc.* FROM {$wpdb->prefix}bookly_customer_appointments bca, {$wpdb->prefix}bookly_payments bp, {$wpdb->prefix}bookly_customers bc WHERE bca.customer_id = $user_id AND bca.customer_id = bc.id AND bca.payment_id = bp.id");
             
             
-            //type,status,total,paid,full_name,phone,country,postcode,state,email,city,street,payment_date
-            //     ["details"]=>
-            //     string(392) "{"items":[{"ca_id":98,"appointment_date":"2021-04-05 10:00:00","service_name":"Rijles 1 uur","service_price":"50","service_tax":0,"wait_listed":false,"number_of_persons":1,"units":1,"duration":"3600","staff_name":"Abdullah Cakmak","extras":[]}],"coupon":null,"subtotal":{"price":"50","deposit":0},"customer":"Samed S\u00f6kmen","tax_in_price":"excluded","tax_paid":"0.00","from_backend":true}"
             if(!empty($payments) && !is_wp_error( $wpdb )){
-                
                 $payment_details = json_decode($payments[0]->details,true);
-                
-                //$payment_details['items'][0];
-                
-                // adjustments
-                
+
                 $output = '';
                 $output .= '<div id="wrapper">';
                 $output .= '<div class="clearfix" id="header_section">';
-                $output .= '<h1>'.__(get_bloginfo('name'), BKLY_NAME).'- INVOICE</h1>';
+                $output .= '<h1>'.__(get_bloginfo('name'), BKLY_NAME).' - INVOICE</h1>';
 
                 $output .= '<div id="customer_info" class="clearfix">';
-                $output .= '<div>Company Name</div>';
                 $output .= '<div>CEO</div>';
                 $output .= '<div>Phone</div>';
                 $output .= '<div><a href="mailto:email@gmail.com">email@gmail.com</a></div>';
@@ -140,10 +108,31 @@ function bookly_invoice_run(){
 
                 $output .= '<div id="informations">';
                 $output .= '<div><span>CUSTOMER</span> '.__($payments[0]->full_name, BKLY_NAME).'</div>';
-                $output .= '<div><span>ADDRESS</span> '.__($payments[0]->state.', '.$payments[0]->city.', '.$payments[0]->street.', '.$payments[0]->postcode.', '.$payments[0]->country, BKLY_NAME).'</div>';
+                $output .= '<div><span>ADDRESS</span>';
+
+                $address = '';
+                if(!empty($payments[0]->state)){
+                    $address .= __($payments[0]->state.', ', BKLY_NAME);
+                }
+                if(!empty($payments[0]->city)){
+                    $address .= __($payments[0]->city.', ', BKLY_NAME);
+                }
+                if(!empty($payments[0]->street)){
+                    $address .= __($payments[0]->street.', ', BKLY_NAME);
+                }
+                if(!empty($payments[0]->postcode)){
+                    $address .= __($payments[0]->postcode.', ', BKLY_NAME);
+                }
+                if(!empty($payments[0]->country)){
+                    $address .= __($payments[0]->country, BKLY_NAME);
+                }
+
+                $address = rtrim($address,', ');
+                $output .= $address;
+
+                $output .= '</div>';
                 $output .= '<div><span>EMAIL</span> <a href="mailto:'.__($payments[0]->email, BKLY_NAME).'">'.__($payments[0]->email, BKLY_NAME).'</a></div>';
-                // $output .= '<div><span>DATE</span> '.__(date('Y/m/d', strtotime($payments[0]->created_at)), BKLY_NAME).'</div>';
-                $output .= '<div><span>TYPE</span> '.__($payments[0]->type, BKLY_NAME).'</div>';
+                $output .= '<div><span>PHONE</span>'.__($payments[0]->phone, BKLY_NAME).'</div>';
                 $output .= '</div>';
 
                 $output .= '</div>';
@@ -163,9 +152,13 @@ function bookly_invoice_run(){
                 $output .= '</thead>';
                 $output .= '<tbody>';
 
+                $total_amount = 0;
+                $paid_amount = 0;
+                
                 foreach($payments as $pay){
                     $_details = json_decode($pay->details,true);
-                    // var_dump($_details['subtotal']['price']);die;
+                    $total_amount += $pay->total;
+                    $paid_amount += $pay->paid;
 
                     $output .= '<tr>';
                     $output .= '<td class="service">'.__($_details['items'][0]['service_name'], BKLY_NAME).'</td>';$output .= '<td class="date">'.__(date('Y/m/d', strtotime($pay->created_at)), BKLY_NAME).'</td>';
@@ -181,19 +174,24 @@ function bookly_invoice_run(){
                     $output .= '<td class="cost">'.__($pay->total, BKLY_NAME).'</td>';
                     $output .= '</tr>';
                 }
-                $output .= '<tr>';
-                $output .= '<td colspan="7">SUBTOTAL</td>';
-                $output .= '<td class="total">'.__($_details['subtotal']['price'], BKLY_NAME).'</td>';
+                $output .= '<tr class="bcolumn">';
+                $output .= '<td colspan="7">TOTAL</td>';
+                $output .= '<td class="total">'.__($total_amount, BKLY_NAME).'</td>';
                 $output .= '</tr>';
-                $output .= '<tr>';
-                $output .= '<td class="total">$1,300.00</td>';
+                $output .= '<tr class="bcolumn">';
+                $output .= '<td colspan="7">PAID</td>';
+                $output .= '<td class="due">'.__($paid_amount, BKLY_NAME).'</td>';
+                $output .= '</tr>';
+                $output .= '<tr class="bcolumn">';
+                $output .= '<td colspan="7">DUE</td>';
+                $output .= '<td class="due">'.__($total_amount-$paid_amount, BKLY_NAME).'</td>';
                 $output .= '</tr>';
                 
                 $output .= '</tbody>';
                 $output .= '</table>';
                 $output .= '</main>';
                 $output .= '</div>';
-
+                $output .= '<button id="pdfdownload" onclick=CreatePDFfromHTML()>Download as a PDF</button>';
                 echo json_encode($output);
                 die;
             }
@@ -202,48 +200,6 @@ function bookly_invoice_run(){
         }
         die;
     }
-
-    // bookly_invoice_reset
-    add_action("wp_ajax_get_user_appoint_information", "get_user_appoint_information");
-    add_action("wp_ajax_nopriv_get_user_appoint_information", "get_user_appoint_information");
-    function get_user_appoint_information(){
-        if(isset($_POST['user_id'])){
-            global $wpdb;
-            $customer_id = $_POST['user_id'];
-            $customer_id = intval($customer_id);
-
-            // How many appoints
-            $user_appointments = $wpdb->get_results("SELECT bca.payment_id AS payment_id,bp.status AS status, bp.details AS payment_details FROM {$wpdb->prefix}bookly_customer_appointments bca, {$wpdb->prefix}bookly_payments bp WHERE bca.customer_id = $customer_id AND bp.id = payment_id");
-            
-            if(!empty($user_appointments) && !is_wp_error( $wpdb )){
-                $output = '';
-                $i = 1;
-                foreach($user_appointments as $payments){
-                    $payment_details = json_decode($payments->payment_details,true);
-                    
-                    $employee = $payment_details['items'][0]['staff_name'];
-                    $date = $payment_details['items'][0]['appointment_date'];
-
-                    $output .= '<tr>';
-                    $output .= '<td>'.$i.'</td>';
-                    $output .= '<td class="date">'.$date.'</td>';
-                    $output .= '<td class="employee">'.__($employee,'bookly-invoice').'</td>';
-                    $output .= '<td class="status '.$payments->status.'">'.__($payments->status,'bookly-invoice').'</td>';
-                    $output .= '<td class="viewbtns"><button payment_id="'.intval($payments->payment_id).'" customer_id="'.intval($customer_id).'" id="view_invoice">VIEW</button></td>';
-                    $output .= '</tr>';
-                    $i++;
-
-                }
-                echo json_encode($output);
-                die;
-            }
-            die;
-        }
-        die;
-    }
-
-    // How many appoints
-    // $user_appointments = $wpdb->get_results("SELECT bca.payment_id AS payment_id,bp.total AS total,bp.status AS status, bp.paid AS paid,bp.created_at AS payment_date, bp.details AS payment_details FROM {$wpdb->prefix}bookly_customer_appointments bca, {$wpdb->prefix}bookly_payments bp WHERE bca.customer_id = $customer_id AND bp.id = payment_id");
 
     // Menu callback funnction
     function bookly_invoice_menupage_display(){
@@ -255,88 +211,7 @@ function bookly_invoice_run(){
             global $wpdb;
             $bookly_cappointments = $wpdb->get_results("SELECT bca.*,bp.*,bc.id AS ID,bc.* FROM {$wpdb->prefix}bookly_customer_appointments bca, {$wpdb->prefix}bookly_payments bp, {$wpdb->prefix}bookly_customers bc WHERE bca.customer_id = bc.id AND bca.payment_id = bp.id GROUP BY bc.full_name");
 
-            // object(stdClass)#831 (54) {
-            //     ["id"]=>
-            //     string(2) "95"
-            //     ["customer_id"]=>
-            //     string(2) "95"
-            //     ["appointment_id"]=>
-            //     string(3) "101"
-            //     ["payment_id"]=>
-            //     string(2) "57"
-            //     ["number_of_persons"]=>
-            //     string(1) "1"
-            //     ["status"]=>
-            //     string(9) "completed"
-            //     ["status_changed_at"]=>
-            //     string(19) "2021-05-06 14:30:19"
-            //     ["type"]=>
-            //     string(5) "local"
-            //     ["total"]=>
-            //     string(5) "50.00"
-            //     ["tax"]=>
-            //     string(4) "0.00"
-            //     ["paid"]=>
-            //     string(5) "50.00"
-            //     ["paid_type"]=>
-            //     string(7) "in_full"
-            // type,status,total,paid,full_name,phone,country,postcode,state,email,city,street,payment_date
-            // //     ["details"]=>
-            // //     string(392) "{"items":[{"ca_id":98,"appointment_date":"2021-04-05 10:00:00","service_name":"Rijles 1 uur","service_price":"50","service_tax":0,"wait_listed":false,"number_of_persons":1,"units":1,"duration":"3600","staff_name":"Abdullah Cakmak","extras":[]}],"coupon":null,"subtotal":{"price":"50","deposit":0},"customer":"Samed S\u00f6kmen","tax_in_price":"excluded","tax_paid":"0.00","from_backend":true}"
-            //     ["wp_user_id"]=>
-            //     string(2) "77"
-            //     ["full_name"]=>
-            //     string(13) "Samed Sökmen"
-            //     ["first_name"]=>
-            //     string(5) "Samed"
-            //     ["last_name"]=>
-            //     string(7) "Sökmen"
-            //     ["payment_date"]=>
-            //     string(19) "2021-04-04 09:36:25"
-            //     ["phone"]=>
-            //     string(12) "+31612324681"
-            //     ["email"]=>
-            //     string(16) "samsok@gmail.com"
-            //     ["country"]=>
-            //     string(0) ""
-            //     ["state"]=>
-            //     string(0) ""
-            //     ["postcode"]=>
-            //     string(6) "2011AC"
-            //     ["city"]=>
-            //     string(7) "Haarlem"
-            //     ["street"]=>
-            //     string(15) "Koralensteeg 44"
-            //     ["street_number"]=>
-            //     string(0) ""
-            //     ["additional_address"]=>
-            //     string(0) ""
-            //   }
-
-            // customer ids
-            $customer_ids = [];
-            // payment ids
-            $payment_ids = [];
-            // All payment details
-            $payment_details = [];
-
-            if(!empty($bookly_cappointments)){
-                foreach($bookly_cappointments as $customerinfo){
-                    // // customer_id
-                    // $customer_ids[] = $customerinfo->customer_id;
-                    // // payment_id
-                    // $payment_ids[] = $customerinfo->payment_id;
-                    // // $payment_details
-                    // $payment_infos = json_decode($customerinfos->payment_details, true);
-                    // $payment_details[] = $payment_info['items'][0];
-
-                    require_once 'invoice-component.php';
-                }
-            }
-
-            // echo '<pre>';
-            // var_dump($customer_ids);
-            
+            require_once 'invoice-component.php';
         }
     }
 }

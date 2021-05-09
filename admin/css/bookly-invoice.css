@@ -40,6 +40,7 @@ td.completed{
 }
 #header_section {
     padding: 10px 0;
+    padding-top: 0px;
     margin-bottom: 30px;
     overflow: hidden;
 }
@@ -126,4 +127,19 @@ table td.total {
   
 table td.grand {
     border-top: 1px solid #5D6975;;
+}
+tr.bcolumn, tr.bcolumn td {
+    background: #fff !important;
+}
+button#pdfdownload {
+    position: fixed;
+    right: 18%;
+    bottom: 34px;
+    cursor: pointer;
+    padding: 10px;
+    background: #2271b1;
+    outline: none;
+    border: none;
+    border-radius: 3px;
+    color: #fff;
 }
