@@ -1,11 +1,14 @@
-<h2>Generate User</h2>
 <div class="search_user">
+  <h2>Generate User</h2>
     <select name="" id="select_user">
-      <option value="">Select User</option>
+      <option value="">Select a Customer</option>
       <?php 
+      $myname = '';
       if(!empty($bookly_cappointments)){
         foreach($bookly_cappointments as $customerinfo){
           echo  '<option value="'.intval($customerinfo->ID).'">'.__($customerinfo->full_name, 'bookly-invoice').'</option>';
+          // Name for pdf
+          $myname = str_replace(' ','-',$customerinfo->full_name);
         }
       }
       ?>
@@ -13,18 +16,13 @@
 </div>
 
 <div class="payments">
-  
+  Please select a user
+  <!-- Dynamic content goes here -->
 </div>
-<link rel="stylesheet" href="https://printjs-4de6.kxcdn.com/print.min.css">
- 
-<script type="text/javascript" src="https://printjs-4de6.kxcdn.com/print.min.js"></script>
 
-<!-- <button onclick=CreatePDFfromHTML()>Download as a PDF</button>
-
-<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/1.5.3/jspdf.min.js"></script>
-<script type="text/javascript" src="https://html2canvas.hertzen.com/dist/html2canvas.js"></script>
 <script>
     function CreatePDFfromHTML() {
+        document.getElementsByClassName('bklyeditbtn')[0].style.display = 'none';
         var HTML_Width = jQuery("#wrapper").width();
         var HTML_Height = jQuery("#wrapper").height();
         var top_left_margin = 15;
@@ -43,7 +41,8 @@
                 pdf.addPage(PDF_Width, PDF_Height);
                 pdf.addImage(imgData, 'JPG', top_left_margin, -(PDF_Height*i)+(top_left_margin*4),canvas_image_width,canvas_image_height);
             }
-            pdf.save("<?php //echo $name ?>_invoice.pdf");
+            pdf.save("<?php echo $myname; ?>-invoice.pdf");
+            document.getElementsByClassName('bklyeditbtn')[0].style.display = 'block';
         });
     }
-</script> -->
+</script>

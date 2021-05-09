@@ -66,7 +66,15 @@ function bookly_invoice_run(){
 
     // Admin Enqueue Scripts
     add_action('admin_enqueue_scripts',function(){
+        wp_register_style( 'select2', 'https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css', array(), '', 'all' );
         wp_register_style( BKLY_NAME, BKLY_URL.'admin/css/bookly-invoice.css', array(), microtime(), 'all' );
+
+        wp_register_script( 'select2', 'https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js', array(), 
+        '', true );
+        wp_register_script( 'jspdf', 'https://cdnjs.cloudflare.com/ajax/libs/jspdf/1.5.3/jspdf.min.js', array(), 
+        '', true );
+        wp_register_script( 'html2canvas', 'https://html2canvas.hertzen.com/dist/html2canvas.js', array(), 
+        '', true );
         wp_register_script( BKLY_NAME, BKLY_URL.'admin/js/bookly-invoice.js', array(), 
         microtime(), true );
         wp_localize_script( BKLY_NAME, 'admin_ajax_action', array(
@@ -79,12 +87,46 @@ function bookly_invoice_run(){
         add_menu_page( 'bookly_invoice', 'bookly_invoice', 'manage_options', 'bookly_invoice', 'bookly_invoice_menupage_display', 'dashicons-admin-network', 45 );
     });
 
+
+    // Get payments information
+    add_action("wp_ajax_save_admin_invoce_info", "save_admin_invoce_info");
+    add_action("wp_ajax_nopriv_save_admin_invoce_info", "save_admin_invoce_info");
+    function save_admin_invoce_info(){
+        global $current_user;
+        if(isset($_POST['ceoinp']) || isset($_POST['phoneinp']) || isset($_POST['emlinp'])){
+            $name = sanitize_text_field( $_POST['ceoinp'] );
+            $phoneinp = sanitize_text_field( $_POST['phoneinp'] );
+            $emlinp = sanitize_email( $_POST['emlinp'] );
+
+            if(get_user_meta( $current_user->ID, 'admin_invoce_name_info',true )){
+                update_user_meta($current_user->ID, 'admin_invoce_name_info', $name);
+            }else{
+                add_user_meta($current_user->ID, 'admin_invoce_name_info', $name);
+            }
+
+            if(get_user_meta( $current_user->ID, 'admin_invoce_phoneinp_info',true )){
+                update_user_meta($current_user->ID, 'admin_invoce_phoneinp_info', $phoneinp);
+            }else{
+                add_user_meta($current_user->ID, 'admin_invoce_phoneinp_info', $phoneinp);
+            }
+
+            if(get_user_meta( $current_user->ID, 'admin_invoce_emlinp_info',true )){
+                update_user_meta($current_user->ID, 'admin_invoce_emlinp_info', $emlinp);
+            }else{
+                add_user_meta($current_user->ID, 'admin_invoce_emlinp_info', $emlinp);
+            }
+            die;
+        }
+        die;
+    }
+
+
     // Get payments information
     add_action("wp_ajax_get_invoice_data", "get_invoice_data");
     add_action("wp_ajax_nopriv_get_invoice_data", "get_invoice_data");
     function get_invoice_data(){
         if(isset($_GET['user_id'])){
-            global $wpdb;
+            global $wpdb,$current_user;
             $user_id = $_GET['user_id'];
             $user_id = intval($user_id);
 
@@ -101,10 +143,21 @@ function bookly_invoice_run(){
                 $output .= '<h1>'.__(get_bloginfo('name'), BKLY_NAME).' - INVOICE</h1>';
 
                 $output .= '<div id="customer_info" class="clearfix">';
-                $output .= '<div>CEO</div>';
-                $output .= '<div>Phone</div>';
-                $output .= '<div><a href="mailto:email@gmail.com">email@gmail.com</a></div>';
+
+                $output .= '<div class="edit_inp">';
+                $output .= '<input type="text" placeholder="CEO" class="ceoinp"><br>';
+                $output .= '<input type="text" placeholder="Phone" class="phoneinp"><br>';
+                $output .= '<input type="email" placeholder="Email" class="emlinp">';
                 $output .= '</div>';
+
+
+                $output .= '<div class="ceotext">'.(get_user_meta( $current_user->ID, 'admin_invoce_name_info',true )?get_user_meta( $current_user->ID, 'admin_invoce_name_info',true ):'My Name').'</div>';
+                $output .= '<div class="phonetext">'.(get_user_meta( $current_user->ID, 'admin_invoce_phoneinp_info',true )?get_user_meta( $current_user->ID, 'admin_invoce_phoneinp_info',true ):'+0000000000').'</div>';
+                $output .= '<div><a href="mailto:'.(get_user_meta( $current_user->ID, 'admin_invoce_emlinp_info',true )?get_user_meta( $current_user->ID, 'admin_invoce_emlinp_info',true ):'').'" class="mailtext">'.(get_user_meta( $current_user->ID, 'admin_invoce_emlinp_info',true )?get_user_meta( $current_user->ID, 'admin_invoce_emlinp_info',true ):'admin@example.com').'</a></div>';
+                $output .= '<div class="bklyeditbtn"><button class="editmood">Edit</button></div>';
+                $output .= '</div>';
+                
+
 
                 $output .= '<div id="informations">';
                 $output .= '<div><span>CUSTOMER</span> '.__($payments[0]->full_name, BKLY_NAME).'</div>';
@@ -205,6 +258,10 @@ function bookly_invoice_run(){
     function bookly_invoice_menupage_display(){
         if(function_exists('bookly_loader')){
             wp_enqueue_style(BKLY_NAME);
+            wp_enqueue_style('select2');
+            wp_enqueue_script('select2');
+            wp_enqueue_script('jspdf');
+            wp_enqueue_script('html2canvas');
             wp_enqueue_script(BKLY_NAME);
             ?>
             <?php
