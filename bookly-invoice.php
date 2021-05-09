@@ -98,22 +98,29 @@ function bookly_invoice_run(){
             $phoneinp = sanitize_text_field( $_POST['phoneinp'] );
             $emlinp = sanitize_email( $_POST['emlinp'] );
 
-            if(get_user_meta( $current_user->ID, 'admin_invoce_name_info',true )){
-                update_user_meta($current_user->ID, 'admin_invoce_name_info', $name);
-            }else{
-                add_user_meta($current_user->ID, 'admin_invoce_name_info', $name);
+            if(!empty($name)){
+                if(get_user_meta( $current_user->ID, 'admin_invoce_name_info',true )){
+                    update_user_meta($current_user->ID, 'admin_invoce_name_info', $name);
+                }else{
+                    add_user_meta($current_user->ID, 'admin_invoce_name_info', $name);
+                }
+                die;
             }
-
-            if(get_user_meta( $current_user->ID, 'admin_invoce_phoneinp_info',true )){
-                update_user_meta($current_user->ID, 'admin_invoce_phoneinp_info', $phoneinp);
-            }else{
-                add_user_meta($current_user->ID, 'admin_invoce_phoneinp_info', $phoneinp);
+            if(!empty($phoneinp)){
+                if(get_user_meta( $current_user->ID, 'admin_invoce_phoneinp_info',true )){
+                    update_user_meta($current_user->ID, 'admin_invoce_phoneinp_info', $phoneinp);
+                }else{
+                    add_user_meta($current_user->ID, 'admin_invoce_phoneinp_info', $phoneinp);
+                }
+                die;
             }
-
-            if(get_user_meta( $current_user->ID, 'admin_invoce_emlinp_info',true )){
-                update_user_meta($current_user->ID, 'admin_invoce_emlinp_info', $emlinp);
-            }else{
-                add_user_meta($current_user->ID, 'admin_invoce_emlinp_info', $emlinp);
+            if(!empty($emlinp)){
+                if(get_user_meta( $current_user->ID, 'admin_invoce_emlinp_info',true )){
+                    update_user_meta($current_user->ID, 'admin_invoce_emlinp_info', $emlinp);
+                }else{
+                    add_user_meta($current_user->ID, 'admin_invoce_emlinp_info', $emlinp);
+                }
+                die;
             }
             die;
         }
@@ -145,9 +152,9 @@ function bookly_invoice_run(){
                 $output .= '<div id="customer_info" class="clearfix">';
 
                 $output .= '<div class="edit_inp">';
-                $output .= '<input type="text" placeholder="CEO" class="ceoinp"><br>';
-                $output .= '<input type="text" placeholder="Phone" class="phoneinp"><br>';
-                $output .= '<input type="email" placeholder="Email" class="emlinp">';
+                $output .= '<input type="text" placeholder="CEO" class="ceoinp" value="'.get_user_meta( $current_user->ID, 'admin_invoce_name_info',true ).'"><br>';
+                $output .= '<input type="text" placeholder="Phone" class="phoneinp" value="'.get_user_meta( $current_user->ID, 'admin_invoce_phoneinp_info',true ).'"><br>';
+                $output .= '<input type="email" placeholder="Email" class="emlinp" value="'.get_user_meta( $current_user->ID, 'admin_invoce_emlinp_info',true ).'">';
                 $output .= '</div>';
 
 

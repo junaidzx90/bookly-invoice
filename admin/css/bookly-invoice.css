@@ -1,12 +1,15 @@
 .search_user {
     text-align: center;
+    margin-bottom: 50px;
 }
 #wrapper .clearfix:after {
     content: "";
     display: table;
     /* clear: both; */
 }
-  
+.selectuser{
+    margin-bottom: 0px !important;
+}
 #wrapper a {
     color: #5D6975;
     text-decoration: underline;
@@ -31,12 +34,11 @@ th.view,td.viewbtns{
 td.viewbtns button{
     cursor: pointer;
 }
-
 .payments {
     width: 70%;
     border: 1px solid #ddd;
-    margin: 50px 0px;
     background: #fff;
+    margin: 0 auto;
 }
 td.completed{
     color: #2271b1;

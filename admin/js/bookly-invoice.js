@@ -16,11 +16,12 @@ jQuery(function ($) {
                         let data = JSON.stringify(response);
                         data = data.replace(/\\/g, '');
                         data = data.slice(1, -1);
-                        $('.payments').html(data)
+                        $('.payments').html(data);
                     }
                 }
             });
         else
+            $('.payments').html('<h1 class="selectuser">Please select a user</h1>');
             $('#wrapper').remove();
             $('button').remove();
     });

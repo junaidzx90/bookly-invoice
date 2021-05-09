@@ -1,5 +1,5 @@
 <div class="search_user">
-  <h2>Generate User</h2>
+  <h2>Booookly Invoice</h2>
     <select name="" id="select_user">
       <option value="">Select a Customer</option>
       <?php 
@@ -16,7 +16,7 @@
 </div>
 
 <div class="payments">
-  Please select a user
+  <h1 class="selectuser">Please select a user</h1>
   <!-- Dynamic content goes here -->
 </div>
 
