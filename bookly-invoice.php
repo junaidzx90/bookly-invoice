@@ -83,7 +83,7 @@ function bookly_invoice_run(){
 
     // Register Menu
     add_action('admin_menu', function(){
-        add_menu_page( 'bookly_invoice', 'bookly_invoice', 'manage_options', 'bookly_invoice', 'bookly_invoice_menupage_display', 'dashicons-editor-table', 45 );
+        add_menu_page( 'bookly_invoice', 'bookly_invoice', 'manage_options', 'bookly_invoice', 'bookly_invoice_menupage_display', 'dashicons-welcome-widgets-menus', 45 );
     });
 
 
