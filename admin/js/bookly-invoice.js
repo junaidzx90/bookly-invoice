@@ -29,22 +29,32 @@ jQuery(function ($) {
     // Save admin info in invoice
     $(document).on("click", '.editmood', function () {
         $(this).prop('class', 'savemood').text("Save");
-        $('.edit_inp').show();
+        $('.edit_inp').css('display','flex');
     });
+
     $(document).on("click", '.savemood', function () {
         let btn = $(this);
-        let ceoinp = $('.ceoinp').val();
-        let phoneinp = $('.phoneinp').val();
-        let emlinp = $('.emlinp').val();
+        let company = $('#company').val();
+        let ceoinp = $('#ceoinp').val();
+        let vatin = $('#vatin').val();
+        let address = $('#address').val();
+        let sign = $('#sign').val();
+        let phoneinp = $('#phoneinp').val();
+        let emlinp = $('#emlinp').val();
         $.ajax({
             type: "post",
             url: admin_ajax_action.ajaxurl,
             data: {
                 action: "save_admin_invoce_info",
+                company: company,
+                vatin: vatin,
+                address: address,
+                sign: sign,
                 ceoinp: ceoinp,
                 phoneinp: phoneinp,
                 emlinp:emlinp
             },
+            
             beforeSend: ()=>{
                 btn.text("Saving");
             },
@@ -55,13 +65,25 @@ jQuery(function ($) {
         });
     });
 
-    $(document).on('keyup', '.ceoinp', function () {
+    $(document).on('keyup', '#company', function () {
+        $('.companytext').text($(this).val())
+    });
+    $(document).on('keyup', '#ceoinp', function () {
         $('.ceotext').text($(this).val())
     });
-    $(document).on('keyup', '.phoneinp', function () {
+    $(document).on('keyup', '#phoneinp', function () {
         $('.phonetext').text($(this).val())
     });
-    $(document).on('keyup', '.emlinp', function () {
+    $(document).on('keyup', '#emlinp', function () {
         $('.mailtext').text($(this).val())
+    });
+    $(document).on('keyup', '#vatin', function () {
+        $('.vatintext').text($(this).val())
+    });
+    $(document).on('keyup', '#address', function () {
+        $('.addresstext').text($(this).val())
+    });
+    $(document).on('keyup', '#sign', function () {
+        $('.signeture_text').children('strong i').text($(this).val())
     });
 });

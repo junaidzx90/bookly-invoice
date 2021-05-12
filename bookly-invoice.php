@@ -30,11 +30,11 @@ add_action( 'plugins_loaded', 'bookly_invoice_init' );
 function bookly_invoice_init() {
     if(!function_exists('bookly_loader')){
         add_action( 'admin_notices', 'bookly_invoice_admin_noticess' );
+    }else{
+        add_action('init', 'bookly_invoice_run');
     }
 
     load_plugin_textdomain( 'bookly_invoice', false, dirname( plugin_basename( __FILE__ ) ) . '/languages' );
-
-    add_action('init', 'bookly_invoice_run');
 }
 
 function bookly_invoice_admin_noticess(){
@@ -70,9 +70,9 @@ function bookly_invoice_run(){
 
         wp_register_script( 'select2', 'https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js', array(), 
         '', true );
-        wp_register_script( 'jspdf', 'https://cdnjs.cloudflare.com/ajax/libs/jspdf/1.5.3/jspdf.min.js', array(), 
+        wp_register_script( 'jspdf', BKLY_URL.'admin/js/jspdf.js', array(), 
         '', true );
-        wp_register_script( 'html2canvas', 'https://html2canvas.hertzen.com/dist/html2canvas.js', array(), 
+        wp_register_script( 'html2canvas', BKLY_URL.'admin/js/html2canvas.js', array(), 
         '', true );
         wp_register_script( BKLY_NAME, BKLY_URL.'admin/js/bookly-invoice.js', array(), 
         microtime(), true );
@@ -83,7 +83,7 @@ function bookly_invoice_run(){
 
     // Register Menu
     add_action('admin_menu', function(){
-        add_menu_page( 'bookly_invoice', 'bookly_invoice', 'manage_options', 'bookly_invoice', 'bookly_invoice_menupage_display', 'dashicons-admin-network', 45 );
+        add_menu_page( 'bookly_invoice', 'bookly_invoice', 'manage_options', 'bookly_invoice', 'bookly_invoice_menupage_display', 'dashicons-editor-table', 45 );
     });
 
 
@@ -97,13 +97,17 @@ function bookly_invoice_run(){
             $phoneinp = sanitize_text_field( $_POST['phoneinp'] );
             $emlinp = sanitize_email( $_POST['emlinp'] );
 
+            $company = sanitize_text_field( $_POST['company'] );
+            $vatin = sanitize_text_field( $_POST['vatin'] );
+            $address = sanitize_text_field( $_POST['address'] );
+            $sign = sanitize_text_field( $_POST['sign'] );
+
             if(!empty($name)){
                 if(get_user_meta( $current_user->ID, 'admin_invoce_name_info',true )){
                     update_user_meta($current_user->ID, 'admin_invoce_name_info', $name);
                 }else{
                     add_user_meta($current_user->ID, 'admin_invoce_name_info', $name);
                 }
-                die;
             }
             if(!empty($phoneinp)){
                 if(get_user_meta( $current_user->ID, 'admin_invoce_phoneinp_info',true )){
@@ -111,7 +115,6 @@ function bookly_invoice_run(){
                 }else{
                     add_user_meta($current_user->ID, 'admin_invoce_phoneinp_info', $phoneinp);
                 }
-                die;
             }
             if(!empty($emlinp)){
                 if(get_user_meta( $current_user->ID, 'admin_invoce_emlinp_info',true )){
@@ -119,7 +122,36 @@ function bookly_invoice_run(){
                 }else{
                     add_user_meta($current_user->ID, 'admin_invoce_emlinp_info', $emlinp);
                 }
-                die;
+            }
+
+
+            if(!empty($company)){
+                if(get_user_meta( $current_user->ID, 'admin_invoce_company_info',true )){
+                    update_user_meta($current_user->ID, 'admin_invoce_company_info', $company);
+                }else{
+                    add_user_meta($current_user->ID, 'admin_invoce_company_info', $company);
+                }
+            }
+            if(!empty($vatin)){
+                if(get_user_meta( $current_user->ID, 'admin_invoce_vatin_info',true )){
+                    update_user_meta($current_user->ID, 'admin_invoce_vatin_info', $vatin);
+                }else{
+                    add_user_meta($current_user->ID, 'admin_invoce_vatin_info', $vatin);
+                }
+            }
+            if(!empty($address)){
+                if(get_user_meta( $current_user->ID, 'admin_invoce_address_info',true )){
+                    update_user_meta($current_user->ID, 'admin_invoce_address_info', $address);
+                }else{
+                    add_user_meta($current_user->ID, 'admin_invoce_address_info', $address);
+                }
+            }
+            if(!empty($sign)){
+                if(get_user_meta( $current_user->ID, 'admin_invoce_sign_info',true )){
+                    update_user_meta($current_user->ID, 'admin_invoce_sign_info', $sign);
+                }else{
+                    add_user_meta($current_user->ID, 'admin_invoce_sign_info', $sign);
+                }
             }
             die;
         }
@@ -146,24 +178,34 @@ function bookly_invoice_run(){
                 $output = '';
                 $output .= '<div id="wrapper">';
                 $output .= '<div class="clearfix" id="header_section">';
-                $output .= '<h1>'.__(get_bloginfo('name'), BKLY_NAME).' - INVOICE</h1>';
+                $output .= '<h1>Auto Rijschool Cakmak Faktuur</h1>';
 
                 $output .= '<div id="customer_info" class="clearfix">';
-
+                // name address VAT nr, Email tel
                 $output .= '<div class="edit_inp">';
-                $output .= '<input type="text" placeholder="CEO" class="ceoinp" value="'.get_user_meta( $current_user->ID, 'admin_invoce_name_info',true ).'"><br>';
-                $output .= '<input type="text" placeholder="Phone" class="phoneinp" value="'.get_user_meta( $current_user->ID, 'admin_invoce_phoneinp_info',true ).'"><br>';
-                $output .= '<input type="email" placeholder="Email" class="emlinp" value="'.get_user_meta( $current_user->ID, 'admin_invoce_emlinp_info',true ).'">';
+                $output .= '<input type="text" placeholder="Company" id="company" value="'.get_user_meta( $current_user->ID, 'admin_invoce_company_info',true ).'">';
+                $output .= '<input type="text" placeholder="Name" id="ceoinp" value="'.get_user_meta( $current_user->ID, 'admin_invoce_name_info',true ).'">';
+                $output .= '<input type="text" placeholder="Tel" id="phoneinp" value="'.get_user_meta( $current_user->ID, 'admin_invoce_phoneinp_info',true ).'">';
+                $output .= '<input type="email" placeholder="Email" id="emlinp" value="'.get_user_meta( $current_user->ID, 'admin_invoce_emlinp_info',true ).'">';
+                $output .= '<input type="text" placeholder="VAT Number" id="vatin" value="'.get_user_meta( $current_user->ID, 'admin_invoce_vatin_info',true ).'">';
+                $output .= '<input type="text" placeholder="Adress" id="address" value="'.get_user_meta( $current_user->ID, 'admin_invoce_address_info',true ).'">';
+                $output .= '<input type="text" placeholder="Signeture" id="sign" value="'.get_user_meta( $current_user->ID, 'admin_invoce_sign_info',true ).'">';
                 $output .= '</div>';
 
+                $output .= '<div class="companytext">'.(get_user_meta( $current_user->ID, 'admin_invoce_company_info',true )?get_user_meta( $current_user->ID, 'admin_invoce_company_info',true ):'Company').'</div>';
 
                 $output .= '<div class="ceotext">'.(get_user_meta( $current_user->ID, 'admin_invoce_name_info',true )?get_user_meta( $current_user->ID, 'admin_invoce_name_info',true ):'My Name').'</div>';
+
                 $output .= '<div class="phonetext">'.(get_user_meta( $current_user->ID, 'admin_invoce_phoneinp_info',true )?get_user_meta( $current_user->ID, 'admin_invoce_phoneinp_info',true ):'+0000000000').'</div>';
+
                 $output .= '<div><a href="mailto:'.(get_user_meta( $current_user->ID, 'admin_invoce_emlinp_info',true )?get_user_meta( $current_user->ID, 'admin_invoce_emlinp_info',true ):'').'" class="mailtext">'.(get_user_meta( $current_user->ID, 'admin_invoce_emlinp_info',true )?get_user_meta( $current_user->ID, 'admin_invoce_emlinp_info',true ):'admin@example.com').'</a></div>';
+
+                $output .= '<div class="vatintext">'.(get_user_meta( $current_user->ID, 'admin_invoce_vatin_info',true )?get_user_meta( $current_user->ID, 'admin_invoce_vatin_info',true ):'VATIN').'</div>';
+
+                $output .= '<div class="addresstext">'.(get_user_meta( $current_user->ID, 'admin_invoce_address_info',true )?get_user_meta( $current_user->ID, 'admin_invoce_address_info',true ):'Address').'</div>';
+
                 $output .= '<div class="bklyeditbtn"><button class="editmood">Edit</button></div>';
                 $output .= '</div>';
-                
-
 
                 $output .= '<div id="informations">';
                 $output .= '<div><span>CUSTOMER</span> '.__($payments[0]->full_name, BKLY_NAME).'</div>';
@@ -200,28 +242,38 @@ function bookly_invoice_run(){
                 $output .= '<thead>';
                 $output .= '<tr>';
                 $output .= '<th class="service">Maintenance</th>';
-                $output .= '<th class="desc">Date</th>';
-                $output .= '<th>Hour</th>';
+                $output .= '<th class="desc">Pay Date</th>';
+                $output .= '<th>Hours</th>';
                 $output .= '<th>Service Price</th>';
                 $output .= '<th class="desc">Adjustments</th>';
                 $output .= '<th class="amount">Adjust-Amount</th>';
                 $output .= '<th class="paid">Paid</th>';
-                $output .= '<th>Cost</th>';
+                $output .= '<th>Costs</th>';
                 $output .= '</tr>';
                 $output .= '</thead>';
                 $output .= '<tbody>';
 
                 $total_amount = 0;
                 $paid_amount = 0;
-                
+
+                $invoice_details = [];
+
                 foreach($payments as $pay){
                     $_details = json_decode($pay->details,true);
                     $total_amount += $pay->total;
                     $paid_amount += $pay->paid;
 
+                    // Using for details
+                    $shortname = explode(' ', $_details['items'][0]['service_name'])[0];
+                    $invoice_details['items'][] = $shortname;
+                    $invoice_details['price'][$shortname.'_price'] += $_details['items'][0]['service_price'];
+                    $invoice_details['durations'][$shortname.'_durations'] += $_details['items'][0]['duration'];
+                    $invoice_details['paid'][$shortname.'_paids'] += $_details['adjustments'][0]['amount'];
+                    
+
                     $output .= '<tr>';
                     $output .= '<td class="service">'.__($_details['items'][0]['service_name'], BKLY_NAME).'</td>';$output .= '<td class="date">'.__(date('Y/m/d', strtotime($pay->created_at)), BKLY_NAME).'</td>';
-                    $output .= '<td class="hour">'.floor($_details['items'][0]['duration'] / (60 * 60)).' Hour </td>';
+                    $output .= '<td class="hour">'.floor($_details['items'][0]['duration'] / (60 * 60)).(floor($_details['items'][0]['duration'] / (60 * 60)) > 1? ' Hours':' Hour').' </td>';
                     $output .= '<td class="price">'.__($_details['items'][0]['service_price'], BKLY_NAME).'</td>';
                     $output .= '<td class="desc">';
                     if($_details['adjustments'][0]['reason'] !== "null"){
@@ -233,6 +285,45 @@ function bookly_invoice_run(){
                     $output .= '<td class="cost">'.__($pay->total, BKLY_NAME).'</td>';
                     $output .= '</tr>';
                 }
+
+                $output .= '</tbody>';
+                $output .= '</table>';
+
+                // Details table
+                $output .= '<div id="bottom_tables">';
+                $output .= '<table id="detailstable">';
+                $output .= '<tbody>';
+                if(!empty($invoice_details)){
+                    foreach(($invoice_details['durations'])  as $key => $duration){
+                        $output .= '<tr colspan="3" class="bcolumn">';
+                        $output .= '<td class="">';
+
+                        $serviceItem = explode('_',$key)[0];
+                        $durations = $duration / (60 * 60);
+                        $originalprice = $invoice_details['price'][$serviceItem.'_price'];
+                        $paidamounts = $invoice_details['paid'][$serviceItem.'_paids'];
+
+                        $output .= 'Total '.strtolower($serviceItem).' '.$durations.' '.($durations > 1? 'hours ': 'hour ' ).$originalprice. ' eur.';
+
+                        $output .= '</td>';
+                        $output .= '</tr>';
+
+                        if($paidamounts){
+                            $output .= '<tr>';
+                            $output .= '<td>';
+                            $output .= 'Total '.strtolower($serviceItem).' paid '.$paidamounts.' eur.';
+                            $output .= '</td>';
+                            $output .= '</tr>';
+                        }
+
+                    }
+                }
+                $output .= '</tbody>';
+                $output .= '</table>';
+
+                // Result table
+                $output .= '<table id="resultable">';
+                $output .= '<tbody>';
                 $output .= '<tr class="bcolumn">';
                 $output .= '<td colspan="7">TOTAL</td>';
                 $output .= '<td class="total">'.__($total_amount, BKLY_NAME).'</td>';
@@ -242,13 +333,22 @@ function bookly_invoice_run(){
                 $output .= '<td class="due">'.__($paid_amount, BKLY_NAME).'</td>';
                 $output .= '</tr>';
                 $output .= '<tr class="bcolumn">';
-                $output .= '<td colspan="7">DUE</td>';
+                $output .= '<td colspan="7">Credit</td>';
                 $output .= '<td class="due">'.__($total_amount-$paid_amount, BKLY_NAME).'</td>';
                 $output .= '</tr>';
-                
                 $output .= '</tbody>';
                 $output .= '</table>';
+                // Result table
+                $output .= '</div>';
+
                 $output .= '</main>';
+                $output .= '<div class="invoice__footer_content">';
+                $output .= '<div class="signeture_text">';
+                $output .= '<strong><i>'.(get_user_meta( $current_user->ID, 'admin_invoce_sign_info',true )?get_user_meta( $current_user->ID, 'admin_invoce_sign_info',true ):'Signeture').'</i></strong>';
+                $output .= '</div>';
+                $output .= '<div class="create_date">00/00/00</div>';
+                $output .= '</div>';
+
                 $output .= '</div>';
                 $output .= '<button id="pdfdownload" onclick=CreatePDFfromHTML()>Download as a PDF</button>';
                 echo json_encode($output);

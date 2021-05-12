@@ -14,7 +14,6 @@
     color: #5D6975;
     text-decoration: underline;
 }
-  
 #wrapper {
     position: relative;
     color: #001028;
@@ -24,7 +23,16 @@
     font-family: Arial;
     padding: 10px;
 }
-  
+div#bottom_tables {
+    display: flex;
+    justify-content: space-between;
+}
+table#resultable {
+    width: 160px;
+}
+table#detailstable tbody tr td {
+    text-align: left;
+}
 th.serial, th.date, th.employee,th.status,tbody#payments_found tr td {
     text-align: left;
 }
@@ -35,10 +43,13 @@ td.viewbtns button{
     cursor: pointer;
 }
 .payments {
-    width: 70%;
+    width: 80%;
     border: 1px solid #ddd;
     background: #fff;
     margin: 0 auto;
+}
+.prepayment{
+    color: #2271b1;
 }
 td.completed{
     color: #2271b1;
@@ -49,7 +60,6 @@ td.completed{
     margin-bottom: 30px;
     overflow: hidden;
 }
-
 h1 {
     border-top: 1px solid  #5D6975;
     border-bottom: 1px solid  #5D6975;
@@ -61,11 +71,9 @@ h1 {
     margin: 0 0 20px 0;
     background: url(../../decoration.png);
 }
-  
 #informations {
     float: left;
 }
-  
 #informations span {
     color: #5D6975;
     text-align: right;
@@ -74,33 +82,27 @@ h1 {
     display: inline-block;
     font-size: 0.8em;
 }
-  
 #customer_info {
     float: right;
     text-align: right;
 }
-  
 #informations div,
 #customer_info div {
     white-space: nowrap;        
 }
-  
 table {
     width: 100%;
     border-collapse: collapse;
     border-spacing: 0;
     margin-bottom: 20px;
 }
-  
 table tr:nth-child(2n-1) td {
     background: #F5F5F5;
 }
-  
 table th,
 table td {
     text-align: center;
 }
-  
 table th {
     padding: 5px 20px;
     color: #5D6975;
@@ -108,28 +110,23 @@ table th {
     white-space: nowrap;        
     font-weight: normal;
 }
-  
 table .service,
 table .desc {
     text-align: left;
 }
-  
 table td {
     padding: 20px;
     text-align: right;
 }
-  
 table td.service,
 table td.desc {
     vertical-align: top;
 }
-  
 table td.unit,
 table td.qty,
 table td.total {
     font-size: 1.2em;
 }
-  
 table td.grand {
     border-top: 1px solid #5D6975;;
 }
@@ -161,10 +158,23 @@ button#pdfdownload {
     background: #ddd;
     border-radius: 4px;
     display: none;
+    flex-direction: column;
 }
 .edit_inp input{
     margin-bottom: 5px;
 }
 .edit_inp input:last-child{
     margin-bottom: 0px;
+}
+.invoice__footer_content {
+    padding: 20px;
+    font-size: 14px;
+    text-align: right;
+}
+.signeture {
+    border-bottom: 1px solid #ddd;
+    padding-bottom: 4px;
+}
+.create_date {
+    margin-top: 5px;
 }

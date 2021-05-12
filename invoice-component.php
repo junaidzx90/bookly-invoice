@@ -16,13 +16,21 @@
 </div>
 
 <div class="payments">
-  <h1 class="selectuser">Please select a user</h1>
+  <h1 class="selectuser">Please select a customer</h1>
   <!-- Dynamic content goes here -->
 </div>
 
 <script>
     function CreatePDFfromHTML() {
         document.getElementsByClassName('bklyeditbtn')[0].style.display = 'none';
+        var today = new Date();
+        var dd = String(today.getDate()).padStart(2, '0');
+        var mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
+        var yyyy = today.getFullYear();
+
+        today = mm + '/' + dd + '/' + yyyy;
+        document.getElementsByClassName('create_date')[0].innerHTML = today;
+
         var HTML_Width = jQuery("#wrapper").width();
         var HTML_Height = jQuery("#wrapper").height();
         var top_left_margin = 15;
