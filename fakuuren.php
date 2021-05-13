@@ -3,22 +3,22 @@
  *
  * @link              https://github.com/
  * @since             1.0.0
- * @package           bookly_invoice
+ * @package           fakuuren
  *
  * @wordpress-plugin
- * Plugin Name:       Bookly Invoice
- * Plugin URI:        https://github.com/junaidzx90/bookly-invoice
+ * Plugin Name:       Fakuuren
+ * Plugin URI:        https://github.com/junaidzx90/fakuuren
  * Description:       This is a short description of what the plugin does. It's displayed in the WordPress admin area.
  * Version:           1.0.0
- * Author:            Junayedzx90
+ * Author:            Junayed
  * Author URI:        https://www.fiverr.com/junaidzx90
- * Text Domain:       bookly-invoice
+ * Text Domain:       fakuuren
  * Domain Path:       /languages
  */
 
 // If this file is called directly, abort.
 
-define( 'BKLY_NAME', 'bookly-invoice' );
+define( 'BKLY_NAME', 'fakuuren' );
 define( 'BKLY_PATH', plugin_dir_path( __FILE__ ) );
 define( 'BKLY_URL', plugin_dir_url( __FILE__ ) );
 
@@ -26,47 +26,47 @@ if ( ! defined( 'WPINC' ) && ! defined('BKLY_NAME') && ! defined('BKLY_PATH')) {
 	die;
 }
 
-add_action( 'plugins_loaded', 'bookly_invoice_init' );
-function bookly_invoice_init() {
+add_action( 'plugins_loaded', 'fakuuren_init' );
+function fakuuren_init() {
     if(!function_exists('bookly_loader')){
-        add_action( 'admin_notices', 'bookly_invoice_admin_noticess' );
+        add_action( 'admin_notices', 'fakuuren_admin_noticess' );
     }else{
-        add_action('init', 'bookly_invoice_run');
+        add_action('init', 'fakuuren_run');
     }
 
-    load_plugin_textdomain( 'bookly_invoice', false, dirname( plugin_basename( __FILE__ ) ) . '/languages' );
+    load_plugin_textdomain( 'fakuuren', false, dirname( plugin_basename( __FILE__ ) ) . '/languages' );
 }
 
-function bookly_invoice_admin_noticess(){
+function fakuuren_admin_noticess(){
     $message = sprintf(
         /* translators: 1: Plugin Name 2: Elementor */
-        print_r( '%1$s requires <a href="https://wordpress.org/plugins/bookly-responsive-appointment-booking-tool/"> %2$s </a> to be installed and activated.', 'bookly_invoice' ),
-        '<strong>' . esc_html__( 'Bookly Invoice', 'bookly_invoice' ) . '</strong>',
-        '<strong>' . esc_html__( 'Bookly', 'bookly_invoice' ) . '</strong>'
+        print_r( '%1$s requires <a href="https://wordpress.org/plugins/bookly-responsive-appointment-booking-tool/"> %2$s </a> to be installed and activated.', 'fakuuren' ),
+        '<strong>' . esc_html__( 'Fakuuren', 'fakuuren' ) . '</strong>',
+        '<strong>' . esc_html__( 'Bookly', 'fakuuren' ) . '</strong>'
     );
 
     printf( '<div class="notice notice-warning is-dismissible"><p>%1$s</p></div>', $message );
 }
 
 // Main Function iitialize
-function bookly_invoice_run(){
-    register_activation_hook( __FILE__, 'activate_bookly_invoice_cplgn' );
-    register_deactivation_hook( __FILE__, 'deactivate_bookly_invoice_cplgn' );
+function fakuuren_run(){
+    register_activation_hook( __FILE__, 'activate_fakuuren_cplgn' );
+    register_deactivation_hook( __FILE__, 'deactivate_fakuuren_cplgn' );
 
     // Activision function
-    function activate_bookly_invoice_cplgn(){
+    function activate_fakuuren_cplgn(){
         // 
     }
 
     // Dectivision function
-    function deactivate_bookly_invoice_cplgn(){
+    function deactivate_fakuuren_cplgn(){
         // Nothing For Now
     }
 
     // Admin Enqueue Scripts
     add_action('admin_enqueue_scripts',function(){
         wp_register_style( 'select2', 'https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css', array(), '', 'all' );
-        wp_register_style( BKLY_NAME, BKLY_URL.'admin/css/bookly-invoice.css', array(), microtime(), 'all' );
+        wp_register_style( BKLY_NAME, BKLY_URL.'admin/css/fakuuren.css', array(), microtime(), 'all' );
 
         wp_register_script( 'select2', 'https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js', array(), 
         '', true );
@@ -74,7 +74,7 @@ function bookly_invoice_run(){
         '', true );
         wp_register_script( 'html2canvas', BKLY_URL.'admin/js/html2canvas.js', array(), 
         '', true );
-        wp_register_script( BKLY_NAME, BKLY_URL.'admin/js/bookly-invoice.js', array(), 
+        wp_register_script( BKLY_NAME, BKLY_URL.'admin/js/fakuuren.js', array(), 
         microtime(), true );
         wp_localize_script( BKLY_NAME, 'admin_ajax_action', array(
             'ajaxurl' => admin_url( 'admin-ajax.php' )
@@ -83,7 +83,7 @@ function bookly_invoice_run(){
 
     // Register Menu
     add_action('admin_menu', function(){
-        add_menu_page( 'bookly_invoice', 'bookly_invoice', 'manage_options', 'bookly_invoice', 'bookly_invoice_menupage_display', 'dashicons-welcome-widgets-menus', 45 );
+        add_menu_page( 'fakuuren', 'fakuuren', 'manage_options', 'fakuuren', 'fakuuren_menupage_display', 'dashicons-welcome-widgets-menus', 45 );
     });
 
 
@@ -160,16 +160,16 @@ function bookly_invoice_run(){
 
 
     // Get payments information
-    add_action("wp_ajax_get_invoice_data", "get_invoice_data");
-    add_action("wp_ajax_nopriv_get_invoice_data", "get_invoice_data");
-    function get_invoice_data(){
+    add_action("wp_ajax_get_fakuuren_data", "get_fakuuren_data");
+    add_action("wp_ajax_nopriv_get_fakuuren_data", "get_fakuuren_data");
+    function get_fakuuren_data(){
         if(isset($_GET['user_id'])){
             global $wpdb,$current_user;
             $user_id = $_GET['user_id'];
             $user_id = intval($user_id);
 
             // How many appoints
-            $payments = $wpdb->get_results("SELECT bca.*,bp.*,bc.* FROM {$wpdb->prefix}bookly_customer_appointments bca, {$wpdb->prefix}bookly_payments bp, {$wpdb->prefix}bookly_customers bc WHERE bca.customer_id = $user_id AND bca.customer_id = bc.id AND bca.payment_id = bp.id");
+            $payments = $wpdb->get_results("SELECT bca.*,bp.*,bp.created_at AS payment_date,bc.* FROM {$wpdb->prefix}bookly_customer_appointments bca, {$wpdb->prefix}bookly_payments bp, {$wpdb->prefix}bookly_customers bc WHERE bca.customer_id = $user_id AND bca.customer_id = bc.id AND bca.payment_id = bp.id");
             
             
             if(!empty($payments) && !is_wp_error( $wpdb )){
@@ -238,17 +238,17 @@ function bookly_invoice_run(){
 
                 $output .= '</div>';
                 $output .= '<main>';
-                $output .= '<table>';
+                $output .= '<table id="toptable">';
                 $output .= '<thead>';
                 $output .= '<tr>';
-                $output .= '<th class="service">Maintenance</th>';
-                $output .= '<th class="desc">Pay Date</th>';
-                $output .= '<th>Hours</th>';
-                $output .= '<th>Service Price</th>';
+                $output .= '<th class="service">Onderhoud</th>';
+                $output .= '<th class="desc">Appo.. Datum</th>';
+                $output .= '<th>Uren</th>';
+                $output .= '<th>Serviceprijs</th>';
                 $output .= '<th class="desc">Adjustments</th>';
-                $output .= '<th class="amount">Adjust-Amount</th>';
-                $output .= '<th class="paid">Paid</th>';
-                $output .= '<th>Costs</th>';
+                $output .= '<th class="amount">Adjust Amount</th>';
+                $output .= '<th class="paid">Betaald</th>';
+                $output .= '<th>Kosten</th>';
                 $output .= '</tr>';
                 $output .= '</thead>';
                 $output .= '<tbody>';
@@ -256,7 +256,7 @@ function bookly_invoice_run(){
                 $total_amount = 0;
                 $paid_amount = 0;
 
-                $invoice_details = [];
+                $fakuuren_details = [];
 
                 foreach($payments as $pay){
                     $_details = json_decode($pay->details,true);
@@ -265,15 +265,17 @@ function bookly_invoice_run(){
 
                     // Using for details
                     $shortname = explode(' ', $_details['items'][0]['service_name'])[0];
-                    $invoice_details['items'][] = $shortname;
-                    $invoice_details['price'][$shortname.'_price'] += $_details['items'][0]['service_price'];
-                    $invoice_details['durations'][$shortname.'_durations'] += $_details['items'][0]['duration'];
-                    $invoice_details['paid'][$shortname.'_paids'] += $_details['adjustments'][0]['amount'];
+                    $fakuuren_details['items'][] = $shortname;
+                    $fakuuren_details['price'][$shortname.'_price'] += $_details['items'][0]['service_price'];
+                    $fakuuren_details['durations'][$shortname.'_durations'] += $_details['items'][0]['duration'];
+                    $fakuuren_details['name'][$shortname.'_name'] = preg_replace("/[^a-zA-Z]+/", " ", $_details['items'][0]['service_name']);
+                    $fakuuren_details['paid'][$shortname.'_paids'] += $_details['adjustments'][0]['amount'];
+                    $fakuuren_details['date'][$shortname.'_date'] = date('Y/m/d', strtotime($pay->payment_date));
                     
 
                     $output .= '<tr>';
-                    $output .= '<td class="service">'.__($_details['items'][0]['service_name'], BKLY_NAME).'</td>';$output .= '<td class="date">'.__(date('Y/m/d', strtotime($pay->created_at)), BKLY_NAME).'</td>';
-                    $output .= '<td class="hour">'.floor($_details['items'][0]['duration'] / (60 * 60)).(floor($_details['items'][0]['duration'] / (60 * 60)) > 1? ' Hours':' Hour').' </td>';
+                    $output .= '<td class="service">'.__($_details['items'][0]['service_name'], BKLY_NAME).'</td>';$output .= '<td class="date">'.__(date('Y/m/d', strtotime($_details['items'][0]['appointment_date'])), BKLY_NAME).'</td>';
+                    $output .= '<td class="hour">'.floor($_details['items'][0]['duration'] / (60 * 60)).(floor($_details['items'][0]['duration'] / (60 * 60)) > 1? ' Uren':' Uur').' </td>';
                     $output .= '<td class="price">'.__($_details['items'][0]['service_price'], BKLY_NAME).'</td>';
                     $output .= '<td class="desc">';
                     if($_details['adjustments'][0]['reason'] !== "null"){
@@ -289,60 +291,64 @@ function bookly_invoice_run(){
                 $output .= '</tbody>';
                 $output .= '</table>';
 
+                $output .= '<h3 class="overviewttl">Overzicht</h3>';
                 // Details table
                 $output .= '<div id="bottom_tables">';
                 $output .= '<table id="detailstable">';
+                $output .= '<thead>';
+                $output .= '<tr>';
+                $output .= '<th>Pay Datum</th>';
+                $output .= '<th>Les type</th>';
+                $output .= '<th>Total Uren</th>';
+                $output .= '<th>Total Kosten</th>';
+                $output .= '<th>Total Adjustments</th>';
+                $output .= '<th>Total</th>';
+                $output .= '</tr>';
+                $output .= '</thead>';
                 $output .= '<tbody>';
-                if(!empty($invoice_details)){
-                    foreach(($invoice_details['durations'])  as $key => $duration){
-                        $output .= '<tr colspan="3" class="bcolumn">';
-                        $output .= '<td class="">';
 
+                if(!empty($fakuuren_details)){
+                    foreach(($fakuuren_details['durations'])  as $key => $duration){
                         $serviceItem = explode('_',$key)[0];
                         $durations = $duration / (60 * 60);
-                        $originalprice = $invoice_details['price'][$serviceItem.'_price'];
-                        $paidamounts = $invoice_details['paid'][$serviceItem.'_paids'];
+                        $originalprice = $fakuuren_details['price'][$serviceItem.'_price'];
+                        $paidamounts = $fakuuren_details['paid'][$serviceItem.'_paids'];
+                        $itemname = $fakuuren_details['name'][$serviceItem.'_name'];
+                        $itemdate = $fakuuren_details['date'][$serviceItem.'_date'];
 
-                        $output .= 'Total '.strtolower($serviceItem).' '.$durations.' '.($durations > 1? 'hours ': 'hour ' ).$originalprice. ' eur.';
+                        $output .= '<tr>';
+                        $output .= '<td>';
+                        $output .= $itemdate;
+                        $output .= '</td>';
+                        
+                        $output .= '<td>';
+                        $output .= str_replace("uu",'', str_replace("uur",'',str_replace("Uren",'',$itemname)));
+                        $output .= '</td>';
 
+                        $output .= '<td>';
+                        $output .= $durations.' '.($durations > 1 ? 'Uren ': 'Uur ' );
+                        $output .= '</td>';
+
+                        $output .= '<td>';
+                        $output .= $originalprice;
+                        $output .= '</td>';
+
+                        $output .= '<td>';
+                        $output .= $paidamounts;
+                        $output .= '</td>';
+
+                        $output .= '<td>';
+                        $output .= ($originalprice-intval(str_replace('-','',$paidamounts)));
                         $output .= '</td>';
                         $output .= '</tr>';
-
-                        if($paidamounts){
-                            $output .= '<tr>';
-                            $output .= '<td>';
-                            $output .= 'Total '.strtolower($serviceItem).' paid '.$paidamounts.' eur.';
-                            $output .= '</td>';
-                            $output .= '</tr>';
-                        }
-
                     }
                 }
                 $output .= '</tbody>';
                 $output .= '</table>';
-
-                // Result table
-                $output .= '<table id="resultable">';
-                $output .= '<tbody>';
-                $output .= '<tr class="bcolumn">';
-                $output .= '<td colspan="7">TOTAL</td>';
-                $output .= '<td class="total">'.__($total_amount, BKLY_NAME).'</td>';
-                $output .= '</tr>';
-                $output .= '<tr class="bcolumn">';
-                $output .= '<td colspan="7">PAID</td>';
-                $output .= '<td class="due">'.__($paid_amount, BKLY_NAME).'</td>';
-                $output .= '</tr>';
-                $output .= '<tr class="bcolumn">';
-                $output .= '<td colspan="7">Credit</td>';
-                $output .= '<td class="due">'.__($total_amount-$paid_amount, BKLY_NAME).'</td>';
-                $output .= '</tr>';
-                $output .= '</tbody>';
-                $output .= '</table>';
-                // Result table
                 $output .= '</div>';
-
+                
                 $output .= '</main>';
-                $output .= '<div class="invoice__footer_content">';
+                $output .= '<div class="fakuuren__footer_content">';
                 $output .= '<div class="signeture_text">';
                 $output .= '<strong><i>'.(get_user_meta( $current_user->ID, 'admin_invoce_sign_info',true )?get_user_meta( $current_user->ID, 'admin_invoce_sign_info',true ):'Signeture').'</i></strong>';
                 $output .= '</div>';
@@ -361,7 +367,7 @@ function bookly_invoice_run(){
     }
 
     // Menu callback funnction
-    function bookly_invoice_menupage_display(){
+    function fakuuren_menupage_display(){
         if(function_exists('bookly_loader')){
             wp_enqueue_style(BKLY_NAME);
             wp_enqueue_style('select2');
@@ -374,7 +380,7 @@ function bookly_invoice_run(){
             global $wpdb;
             $bookly_cappointments = $wpdb->get_results("SELECT bca.*,bp.*,bc.id AS ID,bc.* FROM {$wpdb->prefix}bookly_customer_appointments bca, {$wpdb->prefix}bookly_payments bp, {$wpdb->prefix}bookly_customers bc WHERE bca.customer_id = bc.id AND bca.payment_id = bp.id GROUP BY bc.full_name");
 
-            require_once 'invoice-component.php';
+            require_once 'fakuuren-component.php';
         }
     }
 }

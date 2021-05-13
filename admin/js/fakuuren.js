@@ -7,12 +7,16 @@ jQuery(function ($) {
                 type: "get",
                 url: admin_ajax_action.ajaxurl,
                 data: {
-                    action: "get_invoice_data",
+                    action: "get_fakuuren_data",
                     user_id: user_id
                 },
                 dataType: "json",
+                beforeSend: ()=>{
+                    $('.loading').show();
+                },
                 success: function (response) {
                     if (response) {
+                        $('.loading').hide();
                         let data = JSON.stringify(response);
                         data = data.replace(/\\/g, '');
                         data = data.slice(1, -1);
@@ -21,12 +25,12 @@ jQuery(function ($) {
                 }
             });
         else
-            $('.payments').html('<h1 class="selectuser">Please select a user</h1>');
+            $('.payments').html('<h1 class="selectuser">Please select a customer</h1>');
             $('#wrapper').remove();
             $('button').remove();
     });
 
-    // Save admin info in invoice
+    // Save admin info in fakuuren
     $(document).on("click", '.editmood', function () {
         $(this).prop('class', 'savemood').text("Save");
         $('.edit_inp').css('display','flex');

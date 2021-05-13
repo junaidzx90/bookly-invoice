@@ -1,18 +1,19 @@
 <div class="search_user">
-  <h2>Booookly Invoice</h2>
-    <select name="" id="select_user">
+  <h2>Fakuuren Invoice</h2>
+    <select id="select_user">
       <option value="">Select a Customer</option>
       <?php 
       $myname = '';
       if(!empty($bookly_cappointments)){
         foreach($bookly_cappointments as $customerinfo){
-          echo  '<option value="'.intval($customerinfo->ID).'">'.__($customerinfo->full_name, 'bookly-invoice').'</option>';
+          echo  '<option value="'.intval($customerinfo->ID).'">'.__($customerinfo->full_name, 'fakuuren').'</option>';
           // Name for pdf
           $myname = str_replace(' ','-',$customerinfo->full_name);
         }
       }
       ?>
     </select>
+    <span class="loading">Loading..</span>
 </div>
 
 <div class="payments">
