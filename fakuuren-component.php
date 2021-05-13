@@ -1,5 +1,6 @@
 <div class="search_user">
   <h2>Fakuuren Invoice</h2>
+  <input type="hidden" id="selected" value="">
     <select id="select_user">
       <option value="">Select a Customer</option>
       <?php 
@@ -7,8 +8,6 @@
       if(!empty($bookly_cappointments)){
         foreach($bookly_cappointments as $customerinfo){
           echo  '<option value="'.intval($customerinfo->ID).'">'.__($customerinfo->full_name, 'fakuuren').'</option>';
-          // Name for pdf
-          $myname = str_replace(' ','-',$customerinfo->full_name);
         }
       }
       ?>
@@ -20,7 +19,6 @@
   <h1 class="selectuser">Please select a customer</h1>
   <!-- Dynamic content goes here -->
 </div>
-
 <script>
     function CreatePDFfromHTML() {
         document.getElementsByClassName('bklyeditbtn')[0].style.display = 'none';
@@ -50,7 +48,10 @@
                 pdf.addPage(PDF_Width, PDF_Height);
                 pdf.addImage(imgData, 'JPG', top_left_margin, -(PDF_Height*i)+(top_left_margin*4),canvas_image_width,canvas_image_height);
             }
-            pdf.save("<?php echo $myname; ?>-invoice.pdf");
+
+            let selectElement = document.getElementById('select2-select_user-container').innerText;
+            let selected_customer = selectElement.replace(" ",'-');
+            pdf.save(selected_customer+"-invoice.pdf");
             document.getElementsByClassName('bklyeditbtn')[0].style.display = 'block';
         });
     }

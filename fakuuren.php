@@ -83,9 +83,8 @@ function fakuuren_run(){
 
     // Register Menu
     add_action('admin_menu', function(){
-        add_menu_page( 'fakuuren', 'fakuuren', 'manage_options', 'fakuuren', 'fakuuren_menupage_display', 'dashicons-welcome-widgets-menus', 45 );
+        add_menu_page( 'Fakuuren', 'Fakuuren', 'manage_options', 'fakuuren', 'fakuuren_menupage_display', 'dashicons-welcome-widgets-menus', 45 );
     });
-
 
     // Get payments information
     add_action("wp_ajax_save_admin_invoce_info", "save_admin_invoce_info");
